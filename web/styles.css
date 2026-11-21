@@ -1,0 +1,130 @@
+:root {
+  --bg: #0d1015;
+  --panel: #151a22;
+  --border: #283141;
+  --text: #eef2f7;
+  --muted: #9aa6b8;
+  --accent: #f59e0b;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: "Space Grotesk", sans-serif;
+  background: var(--bg);
+  color: var(--text);
+}
+
+code, pre, .metric-value, .console-feed, .terminal-input {
+  font-family: "JetBrains Mono", monospace;
+}
+
+.command-bar {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem 1.25rem;
+  background: var(--panel);
+  border-bottom: 1px solid var(--border);
+}
+
+.brand-title {
+  margin: 0;
+  font-size: 1.35rem;
+}
+
+.accent-ember {
+  color: var(--accent);
+}
+
+.telemetry-strip {
+  display: flex;
+  gap: 1.25rem;
+  margin: 0;
+}
+
+.metric-value {
+  margin: 0.15rem 0 0;
+  font-size: 1.1rem;
+  color: var(--accent);
+}
+
+.workspace-shell {
+  display: grid;
+  grid-template-columns: 260px 1fr 300px;
+  min-height: calc(100vh - 80px);
+}
+
+.control-rail, .inspector-drawer {
+  padding: 1rem;
+  background: var(--panel);
+  border-right: 1px solid var(--border);
+}
+
+.inspector-drawer {
+  border-right: 0;
+  border-left: 1px solid var(--border);
+}
+
+.primary-stage {
+  padding: 1rem;
+  position: relative;
+}
+
+.graph-viewport {
+  position: relative;
+  min-height: 420px;
+  border: 1px dashed var(--border);
+  border-radius: 8px;
+  margin-top: 0.75rem;
+  overflow: hidden;
+}
+
+.graph-node, .tombstone-card {
+  position: absolute;
+  padding: 0.55rem 0.75rem;
+  background: #1b222e;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  font-size: 0.85rem;
+}
+
+.tombstone-grid {
+  position: static;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 0.75rem;
+  margin-top: 0.75rem;
+}
+
+.tombstone-card {
+  position: static;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.btn, .tab-btn, .filter-chip, .terminal-input {
+  background: #1c2330;
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 0.45rem 0.7rem;
+  cursor: pointer;
+}
+
+.btn-primary, .tab-btn.active, .filter-chip.active {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+@media (max-width: 900px) {
+  .workspace-shell {
+    grid-template-columns: 1fr;
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "scannedAt": "2026-11-21T18:20:51.317Z",
+  "pkgStatus": "missing",
+  "depCount": 0,
+  "fileCount": 1,
+  "healthScore": 85,
+  "files": [
+    "scan.js"
+  ]
+}

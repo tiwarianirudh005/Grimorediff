@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="obsidian-telemetry">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>GrimoireDiff // Codebase Séance &amp; Dependency Telemetry</title>
+  <!-- Typography: JetBrains Mono for telemetry/code + Space Grotesk for crisp display headers -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <!-- Subtle ambient grid/scanline overlay (pointer-events: none in CSS) -->
+  <div class="ambient-grid" aria-hidden="true"></div>
+
+  <!-- 1. TOP COMMAND BAR: Live telemetry & primary controls -->
+  <header class="command-bar">
+    <div class="brand-cluster">
+      <span class="status-beacon" data-status="ready" aria-hidden="true"></span>
+      <div>
+        <h1 class="brand-title">GRIMOIRE<span class="accent-ember">DIFF</span></h1>
+        <p class="brand-subtitle">STATIC AST &amp; DEPENDENCY SÉANCE HUD v1.0</p>
+      </div>
+    </div>
+
+    <!-- Real-time numeric telemetry strip -->
+    <dl class="telemetry-strip" aria-label="Repository Health Metrics">
+      <div class="metric-unit">
+        <dt>VITALITY INDEX</dt>
+        <dd id="health-score" class="metric-value">--<span>/100</span></dd>
+      </div>
+      <div class="metric-unit">
+        <dt>DORMANT SPIRITS</dt>
+        <dd id="dormant-count" class="metric-value">0</dd>
+      </div>
+      <div class="metric-unit">
+        <dt>CURSED PACKAGES</dt>
+        <dd id="risk-count" class="metric-value">0</dd>
+      </div>
+      <div class="metric-unit">
+        <dt>SCANNED NODES</dt>
+        <dd id="total-nodes" class="metric-value">0</dd>
+      </div>
+    </dl>
+
+    <!-- Action controls: Load report.json or run built-in sample séance -->
+    <div class="command-actions">
+      <label class="btn btn-ghost" for="report-upload">
+        <span>LOAD REPORT.JSON</span>
+        <input type="file" id="report-upload" accept=".json" hidden />
+      </label>
+      <button type="button" id="load-sample-btn" class="btn btn-primary">
+        SUMMON SAMPLE SCAN
+      </button>
+    </div>
+  </header>
+
+  <!-- 2. MAIN WORKSPACE COCKPIT: Filter Rail + Interactive Stage + Inspector Drawer -->
+  <div class="workspace-shell">
+    
+    <!-- LEFT RAIL: Filters & View Mode Switcher -->
+    <nav class="control-rail" aria-label="Scan Filters and Views">
+      <section class="rail-section">
+        <h2 class="rail-heading">VIEWPORT MODE</h2>
+        <div class="segmented-control" role="tablist">
+          <button type="button" role="tab" class="tab-btn active" data-view="constellation" aria-selected="true">
+            SPECTRAL GRAPH
+          </button>
+          <button type="button" role="tab" class="tab-btn" data-view="tombstones" aria-selected="false">
+            TOMBSTONE LEDGER
+          </button>
+        </div>
+      </section>
+
+      <section class="rail-section">
+        <h2 class="rail-heading">FILTER ANOMALIES</h2>
+        <div class="filter-group" role="group" aria-label="Filter by classification">
+          <button type="button" class="filter-chip active" data-filter="all">ALL ENTITIES</button>
+          <button type="button" class="filter-chip" data-filter="dormant">DORMANT SPIRITS (UNUSED)</button>
+          <button type="button" class="filter-chip" data-filter="dependency">PACKAGE CURSES</button>
+          <button type="button" class="filter-chip" data-filter="healthy">BOUND &amp; ACTIVE</button>
+        </div>
+      </section>
+
+      <section class="rail-section">
+        <h2 class="rail-heading">LOCATE SYMBOL / FILE</h2>
+        <input
+          type="search"
+          id="entity-search"
+          class="terminal-input"
+          placeholder="e.g. legacy-util.js..."
+          aria-label="Search files or dependencies"
+        />
+      </section>
+
+      <!-- Live Terminal Event Log -->
+      <section class="rail-section rail-console">
+        <h2 class="rail-heading">SÉANCE LOG</h2>
+        <ol id="event-log" class="console-feed" aria-live="polite">
+          <li>[SYSTEM] Awaiting report.json payload...</li>
+        </ol>
+      </section>
+    </nav>
+
+    <!-- CENTER STAGE: Interactive Movable Graph + Switchable Ledger View -->
+    <main class="primary-stage" id="primary-stage">
+      <!-- View A: Interactive Draggable Node / Spectral Thread Canvas -->
+      <section id="view-constellation" class="stage-view active" aria-label="Interactive Dependency Graph">
+        <div class="stage-toolbar">
+          <span class="hint-badge">DRAG NODES TO RE-ARRANGE &bull; CLICK ENTITY TO INSPECT</span>
+          <button type="button" id="reset-layout-btn" class="btn btn-mini">RE-ALIGN GRAPH</button>
+        </div>
+        <div id="graph-viewport" class="graph-viewport">
+          <!-- SVG layer renders connecting threads between files/packages -->
+          <svg id="spectral-threads" class="spectral-threads" aria-hidden="true"></svg>
+          <!-- JS injects draggable node elements here -->
+          <div id="node-layer" class="node-layer"></div>
+        </div>
+      </section>
+
+      <!-- View B: High-Density Asymmetric Tombstone Matrix -->
+      <section id="view-tombstones" class="stage-view" aria-label="Tombstone Ledger" hidden>
+        <div id="tombstone-grid" class="tombstone-grid">
+          <!-- JS injects interactive audit cards here -->
+        </div>
+      </section>
+    </main>
+
+    <!-- RIGHT DRAWER: Séance Inspector (Updates on node/card click) -->
+    <aside class="inspector-drawer" id="inspector-drawer" aria-label="Entity Diagnostics">
+      <div class="drawer-header">
+        <span class="drawer-tag" id="inspector-tag">NO TARGET LOCKED</span>
+        <button type="button" id="close-inspector-btn" class="btn-icon" aria-label="Clear selection">&times;</button>
+      </div>
+
+      <div id="inspector-empty" class="inspector-empty">
+        <p>Select any node on the Spectral Graph or Tombstone Ledger to inspect references, risk vectors, and Kiro cleanup specs.</p>
+      </div>
+
+      <div id="inspector-content" class="inspector-content" hidden>
+        <h2 id="inspector-title" class="inspector-title">filename.js</h2>
+        <p id="inspector-path" class="inspector-path">src/utils/filename.js</p>
+
+        <div class="diagnostic-block">
+          <h3>DIAGNOSIS</h3>
+          <p id="inspector-diagnosis">Zero inbound imports detected across scanned AST.</p>
+        </div>
+
+        <div class="diagnostic-block">
+          <h3>REFERENCE TRACE</h3>
+          <ul id="inspector-refs" class="ref-list"></ul>
+        </div>
+
+        <div class="diagnostic-block">
+          <h3>SUGGESTED KIRO SPEC ACTION</h3>
+          <pre id="inspector-remediation" class="code-snippet"><code>// Safe quarantine or removal task</code></pre>
+        </div>
+      </div>
+    </aside>
+
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
